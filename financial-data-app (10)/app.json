@@ -1,0 +1,79 @@
+{
+  "expo": {
+    "name": "Trading ProAnalytics",
+    "slug": "financial-data-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "https://placehold.co/512x512?text=TPA+Icon",
+    "scheme": "tradingproanalytics",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "https://placehold.co/512x512?text=TPA+Splash",
+      "resizeMode": "contain",
+      "backgroundColor": "#0A0E17"
+    },
+    "notification": {
+      "icon": "https://placehold.co/512x512?text=TPA+Notification",
+      "color": "#3F51B5",
+      "iosDisplayInForeground": true
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.tradingproanalytics.app",
+      "buildNumber": "1",
+      "infoPlist": {
+        "UIBackgroundModes": [
+          "remote-notification"
+        ]
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "https://placehold.co/512x512?text=TPA+Adaptive+Icon",
+        "backgroundColor": "#0A0E17"
+      },
+      "package": "com.tradingproanalytics.app",
+      "versionCode": 1,
+      "googleServicesFile": "./google-services.json",
+      "permissions": [
+        "RECEIVE_BOOT_COMPLETED",
+        "VIBRATE"
+      ]
+    },
+    "web": {
+      "favicon": "https://placehold.co/32x32?text=TPA+Favicon"
+    },
+    "plugins": [
+      [
+        "expo-router",
+        {
+          "origin": "https://tradingproanalytics.com"
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "https://placehold.co/512x512?text=TPA+Notification+Icon",
+          "color": "#3F51B5",
+          "sounds": [
+            "./assets/notification.wav"
+          ]
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "your-project-id"
+      }
+    },
+    "owner": "tradingproanalytics",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/your-project-id",
+      "enabled": true,
+      "fallbackToCacheTimeout": 0
+    }
+  }
+}
