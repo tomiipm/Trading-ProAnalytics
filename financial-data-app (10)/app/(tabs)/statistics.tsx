@@ -1,48 +1,51 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, ScrollView, Pressable, Dimensions, ActivityIndicator } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { StatusBar } from 'expo-status-bar';
-import { useForexStore } from '@/store/forex-store';
-import { darkTheme } from '@/constants/colors';
-import { ArrowUpRight, ArrowDownRight, TrendingUp, RefreshCw, Percent, DollarSign, Globe } from 'lucide-react-native';
-import Animated, { FadeInDown, FadeInRight, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
-import { LinearGradient } from 'expo-linear-gradient';
-import { Platform } from 'react-native';
-import { useForexData } from '@/hooks/useForexData';
-import { CONFIG } from '@/constants/config';
+"use client"
 
-const { width } = Dimensions.get('window');
+import { useState } from "react"
+import { StyleSheet, View, Text, ScrollView, Pressable, Dimensions } from "react-native"
+import { SafeAreaView } from "react-native-safe-area-context"
+import { StatusBar } from "expo-status-bar"
+import { useForexStore } from "@/store/forex-store"
+import { darkTheme } from "@/constants/colors"
+import { ArrowUpRight, ArrowDownRight, TrendingUp, RefreshCw, Percent, DollarSign, Globe } from "lucide-react-native"
+import Animated, {
+  FadeInDown,
+  FadeInRight,
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from "react-native-reanimated"
+import { LinearGradient } from "expo-linear-gradient"
+import { useForexData } from "@/hooks/useForexData"
 
-const TABS = ['Overview', 'Profit'];
+const { width } = Dimensions.get("window")
+
+const TABS = ["Overview", "Profit"]
 
 export default function StatisticsScreen() {
-  const { performanceStats, weeklyPerformance, isMarketOpen, currentSession } = useForexStore();
-  const { isLoading, error, refreshData, isApiAvailable } = useForexData();
-  const [activeTab, setActiveTab] = useState('Overview');
-  const [lastUpdated, setLastUpdated] = useState(new Date());
-  
+  const { performanceStats, weeklyPerformance, isMarketOpen, currentSession } = useForexStore()
+  const { isLoading, error, refreshData, isApiAvailable } = useForexData()
+  const [activeTab, setActiveTab] = useState("Overview")
+  const [lastUpdated, setLastUpdated] = useState(new Date())
+
   // Animation values
-  const refreshRotation = useSharedValue(0);
-  
+  const refreshRotation = useSharedValue(0)
+
   const handleRefresh = () => {
-    refreshData();
-    refreshRotation.value = withSpring(refreshRotation.value + 360);
-  };
-  
+    refreshData()
+    refreshRotation.value = withSpring(refreshRotation.value + 360)
+  }
+
   const refreshAnimatedStyle = useAnimatedStyle(() => {
     return {
-      transform: [{ rotate: `${refreshRotation.value}deg` }]
-    };
-  });
-  
+      transform: [{ rotate: `${refreshRotation.value}deg` }],
+    }
+  })
+
   const renderOverviewTab = () => (
     <View style={styles.tabContent}>
-      <Animated.View 
-        entering={FadeInDown.springify()}
-        style={styles.overviewCard}
-      >
+      <Animated.View entering={FadeInDown.springify()} style={styles.overviewCard}>
         <LinearGradient
-          colors={['#1a237e', '#3949ab']}
+          colors={["#1a237e", "#3949ab"]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={styles.overviewCardGradient}
@@ -54,22 +57,22 @@ export default function StatisticsScreen() {
                 <Text style={styles.overviewCardBadgeText}>LIVE</Text>
               </View>
             </View>
-            
+
             <View style={styles.overviewCardStats}>
               <View style={styles.overviewCardStat}>
                 <Text style={styles.overviewCardStatValue}>{performanceStats.accuracy}%</Text>
                 <Text style={styles.overviewCardStatLabel}>Win Rate</Text>
               </View>
-              
+
               <View style={styles.overviewCardDivider} />
-              
+
               <View style={styles.overviewCardStat}>
                 <Text style={styles.overviewCardStatValue}>{performanceStats.totalTrades}</Text>
                 <Text style={styles.overviewCardStatLabel}>Total Trades</Text>
               </View>
-              
+
               <View style={styles.overviewCardDivider} />
-              
+
               <View style={styles.overviewCardStat}>
                 <Text style={styles.overviewCardStatValue}>{performanceStats.totalPips}</Text>
                 <Text style={styles.overviewCardStatLabel}>Total Pips</Text>
@@ -78,45 +81,33 @@ export default function StatisticsScreen() {
           </View>
         </LinearGradient>
       </Animated.View>
-      
+
       <View style={styles.statsGrid}>
-        <Animated.View 
-          entering={FadeInDown.delay(100).springify()}
-          style={styles.statCard}
-        >
+        <Animated.View entering={FadeInDown.delay(100).springify()} style={styles.statCard}>
           <View style={styles.statCardHeader}>
             <ArrowUpRight size={20} color={darkTheme.success} />
           </View>
           <Text style={styles.statCardValue}>{performanceStats.profitTrades}</Text>
           <Text style={styles.statCardLabel}>Winning Trades</Text>
         </Animated.View>
-        
-        <Animated.View 
-          entering={FadeInDown.delay(200).springify()}
-          style={styles.statCard}
-        >
+
+        <Animated.View entering={FadeInDown.delay(200).springify()} style={styles.statCard}>
           <View style={styles.statCardHeader}>
             <ArrowDownRight size={20} color={darkTheme.danger} />
           </View>
           <Text style={styles.statCardValue}>{performanceStats.lossTrades}</Text>
           <Text style={styles.statCardLabel}>Losing Trades</Text>
         </Animated.View>
-        
-        <Animated.View 
-          entering={FadeInDown.delay(300).springify()}
-          style={styles.statCard}
-        >
+
+        <Animated.View entering={FadeInDown.delay(300).springify()} style={styles.statCard}>
           <View style={styles.statCardHeader}>
             <Percent size={20} color="#64B5F6" />
           </View>
           <Text style={styles.statCardValue}>{performanceStats.riskRewardRatio.toFixed(1)}</Text>
           <Text style={styles.statCardLabel}>Risk/Reward</Text>
         </Animated.View>
-        
-        <Animated.View 
-          entering={FadeInDown.delay(400).springify()}
-          style={styles.statCard}
-        >
+
+        <Animated.View entering={FadeInDown.delay(400).springify()} style={styles.statCard}>
           <View style={styles.statCardHeader}>
             <TrendingUp size={20} color="#FFB74D" />
           </View>
@@ -124,61 +115,51 @@ export default function StatisticsScreen() {
           <Text style={styles.statCardLabel}>Trades/Day</Text>
         </Animated.View>
       </View>
-      
-      <Animated.View 
-        entering={FadeInDown.delay(500).springify()}
-        style={styles.weeklyPerformanceCard}
-      >
+
+      <Animated.View entering={FadeInDown.delay(500).springify()} style={styles.weeklyPerformanceCard}>
         <View style={styles.weeklyPerformanceHeader}>
           <Text style={styles.weeklyPerformanceTitle}>Weekly Performance</Text>
         </View>
-        
+
         <View style={styles.weeklyPerformanceChart}>
           {weeklyPerformance.map((item, index) => {
-            const barHeight = Math.min(Math.abs(item.pips) * 2, 100);
-            const isPositive = item.pips >= 0;
-            
+            const barHeight = Math.min(Math.abs(item.pips) * 2, 100)
+            const isPositive = item.pips >= 0
+
             return (
               <View key={item.day} style={styles.weeklyPerformanceBar}>
-                <Text style={[
-                  styles.weeklyPerformanceValue,
-                  isPositive ? styles.positiveText : styles.negativeText
-                ]}>
-                  {isPositive ? '+' : ''}{item.pips}
+                <Text style={[styles.weeklyPerformanceValue, isPositive ? styles.positiveText : styles.negativeText]}>
+                  {isPositive ? "+" : ""}
+                  {item.pips}
                 </Text>
-                
+
                 <View style={styles.weeklyPerformanceBarContainer}>
                   <LinearGradient
-                    colors={isPositive ? 
-                      ['#4CAF50', '#81C784'] : 
-                      ['#F44336', '#E57373']}
+                    colors={isPositive ? ["#4CAF50", "#81C784"] : ["#F44336", "#E57373"]}
                     style={[
                       styles.weeklyPerformanceBarFill,
-                      { 
+                      {
                         height: barHeight,
-                        backgroundColor: isPositive ? darkTheme.success : darkTheme.danger
-                      }
+                        backgroundColor: isPositive ? darkTheme.success : darkTheme.danger,
+                      },
                     ]}
                   />
                 </View>
-                
+
                 <Text style={styles.weeklyPerformanceDay}>{item.day}</Text>
               </View>
-            );
+            )
           })}
         </View>
       </Animated.View>
     </View>
-  );
-  
+  )
+
   const renderProfitTab = () => (
     <View style={styles.tabContent}>
-      <Animated.View 
-        entering={FadeInDown.springify()}
-        style={styles.profitCard}
-      >
+      <Animated.View entering={FadeInDown.springify()} style={styles.profitCard}>
         <LinearGradient
-          colors={['#1E88E5', '#42A5F5']}
+          colors={["#1E88E5", "#42A5F5"]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={styles.profitCardGradient}
@@ -188,17 +169,18 @@ export default function StatisticsScreen() {
               <DollarSign size={24} color="#FFFFFF" />
               <Text style={styles.profitCardTitle}>Profit Analysis</Text>
             </View>
-            
+
             <Text style={styles.profitCardValue}>
-              {performanceStats.totalPips >= 0 ? '+' : ''}{performanceStats.totalPips} pips
+              {performanceStats.totalPips >= 0 ? "+" : ""}
+              {performanceStats.totalPips} pips
             </Text>
-            
+
             <View style={styles.profitCardStats}>
               <View style={styles.profitCardStat}>
                 <Text style={styles.profitCardStatLabel}>Avg Profit/Trade</Text>
                 <Text style={styles.profitCardStatValue}>+{performanceStats.averageProfitPerTrade} pips</Text>
               </View>
-              
+
               <View style={styles.profitCardStat}>
                 <Text style={styles.profitCardStatLabel}>Avg Loss/Trade</Text>
                 <Text style={styles.profitCardStatValue}>-{performanceStats.averageLossPerTrade} pips</Text>
@@ -207,72 +189,66 @@ export default function StatisticsScreen() {
           </View>
         </LinearGradient>
       </Animated.View>
-      
-      <Animated.View 
-        entering={FadeInDown.delay(200).springify()}
-        style={styles.profitBreakdownCard}
-      >
+
+      <Animated.View entering={FadeInDown.delay(200).springify()} style={styles.profitBreakdownCard}>
         <Text style={styles.profitBreakdownTitle}>Profit Breakdown</Text>
-        
+
         <View style={styles.profitBreakdownItem}>
           <View style={styles.profitBreakdownItemHeader}>
             <Text style={styles.profitBreakdownItemTitle}>EUR/USD</Text>
             <Text style={[styles.profitBreakdownItemValue, styles.positiveText]}>+42 pips</Text>
           </View>
           <View style={styles.profitBreakdownItemBar}>
-            <View style={[styles.profitBreakdownItemBarFill, { width: '70%', backgroundColor: darkTheme.success }]} />
+            <View style={[styles.profitBreakdownItemBarFill, { width: "70%", backgroundColor: darkTheme.success }]} />
           </View>
         </View>
-        
+
         <View style={styles.profitBreakdownItem}>
           <View style={styles.profitBreakdownItemHeader}>
             <Text style={styles.profitBreakdownItemTitle}>GBP/USD</Text>
             <Text style={[styles.profitBreakdownItemValue, styles.positiveText]}>+28 pips</Text>
           </View>
           <View style={styles.profitBreakdownItemBar}>
-            <View style={[styles.profitBreakdownItemBarFill, { width: '50%', backgroundColor: darkTheme.success }]} />
+            <View style={[styles.profitBreakdownItemBarFill, { width: "50%", backgroundColor: darkTheme.success }]} />
           </View>
         </View>
-        
+
         <View style={styles.profitBreakdownItem}>
           <View style={styles.profitBreakdownItemHeader}>
             <Text style={styles.profitBreakdownItemTitle}>USD/JPY</Text>
             <Text style={[styles.profitBreakdownItemValue, styles.negativeText]}>-15 pips</Text>
           </View>
           <View style={styles.profitBreakdownItemBar}>
-            <View style={[styles.profitBreakdownItemBarFill, { width: '30%', backgroundColor: darkTheme.danger }]} />
+            <View style={[styles.profitBreakdownItemBarFill, { width: "30%", backgroundColor: darkTheme.danger }]} />
           </View>
         </View>
-        
+
         <View style={styles.profitBreakdownItem}>
           <View style={styles.profitBreakdownItemHeader}>
             <Text style={styles.profitBreakdownItemTitle}>AUD/USD</Text>
             <Text style={[styles.profitBreakdownItemValue, styles.positiveText]}>+18 pips</Text>
           </View>
           <View style={styles.profitBreakdownItemBar}>
-            <View style={[styles.profitBreakdownItemBarFill, { width: '40%', backgroundColor: darkTheme.success }]} />
+            <View style={[styles.profitBreakdownItemBarFill, { width: "40%", backgroundColor: darkTheme.success }]} />
           </View>
         </View>
       </Animated.View>
-      
-      <Animated.View 
-        entering={FadeInDown.delay(400).springify()}
-        style={styles.profitTimeCard}
-      >
+
+      <Animated.View entering={FadeInDown.delay(400).springify()} style={styles.profitTimeCard}>
         <Text style={styles.profitTimeTitle}>Best Trading Times</Text>
-        
+
         <View style={styles.profitTimeItem}>
           <View style={styles.profitTimeItemDot} />
           <Text style={styles.profitTimeItemText}>London Session (8:00 - 16:00 GMT)</Text>
           <Text style={[styles.profitTimeItemValue, styles.positiveText]}>+45 pips</Text>
         </View>
-        
+
         <View style={styles.profitTimeItem}>
           <View style={styles.profitTimeItemDot} />
           <Text style={styles.profitTimeItemText}>New York Session (13:00 - 21:00 GMT)</Text>
           <Text style={[styles.profitTimeItemValue, styles.positiveText]}>+32 pips</Text>
         </View>
-        
+
         <View style={styles.profitTimeItem}>
           <View style={styles.profitTimeItemDot} />
           <Text style={styles.profitTimeItemText}>Asian Session (00:00 - 8:00 GMT)</Text>
@@ -280,42 +256,33 @@ export default function StatisticsScreen() {
         </View>
       </Animated.View>
     </View>
-  );
-  
+  )
+
   const renderStatusBar = () => {
-    if (isApiAvailable === null) return null;
-    
+    if (isApiAvailable === null) return null
+
     return (
       <View style={styles.statusContainer}>
-        <View style={[
-          styles.statusBar,
-          isApiAvailable ? styles.statusBarOnline : styles.statusBarOffline
-        ]}>
+        <View style={[styles.statusBar, isApiAvailable ? styles.statusBarOnline : styles.statusBarOffline]}>
           <Text style={styles.statusBarText}>
-            {isApiAvailable ? 'Real-Time Data: Online' : 'Real-Time Data: Offline (Using Mock Data)'}
+            {isApiAvailable ? "Real-Time Data: Online" : "Real-Time Data: Offline (Using Mock Data)"}
           </Text>
         </View>
-        <View style={[
-          styles.statusBar,
-          isMarketOpen ? styles.marketOpen : styles.marketClosed
-        ]}>
+        <View style={[styles.statusBar, isMarketOpen ? styles.marketOpen : styles.marketClosed]}>
           <Globe size={14} color={isMarketOpen ? darkTheme.success : darkTheme.danger} style={styles.marketIcon} />
           <Text style={styles.statusBarText}>
-            {isMarketOpen ? `Market: Open (${currentSession} Session)` : 'Market: Closed'}
+            {isMarketOpen ? `Market: Open (${currentSession} Session)` : "Market: Closed"}
           </Text>
         </View>
       </View>
-    );
-  };
-  
+    )
+  }
+
   return (
-    <SafeAreaView style={styles.container} edges={['bottom']}>
+    <SafeAreaView style={styles.container} edges={["bottom"]}>
       <StatusBar style="light" />
-      
-      <Animated.View 
-        entering={FadeInDown.springify()}
-        style={styles.header}
-      >
+
+      <Animated.View entering={FadeInDown.springify()} style={styles.header}>
         <View style={styles.titleContainer}>
           <Text style={styles.title}>Performance</Text>
           <Text style={styles.subtitle}>Real-time trading analytics</Text>
@@ -328,43 +295,30 @@ export default function StatisticsScreen() {
           </Pressable>
         </View>
       </Animated.View>
-      
+
       {renderStatusBar()}
-      
-      <Animated.View 
-        entering={FadeInRight.delay(200).springify()}
-        style={styles.tabsContainer}
-      >
+
+      <Animated.View entering={FadeInRight.delay(200).springify()} style={styles.tabsContainer}>
         {TABS.map((tab) => (
           <Pressable
             key={tab}
-            style={[
-              styles.tabButton,
-              activeTab === tab && styles.activeTabButton
-            ]}
+            style={[styles.tabButton, activeTab === tab && styles.activeTabButton]}
             onPress={() => setActiveTab(tab)}
           >
-            <Text
-              style={[
-                styles.tabButtonText,
-                activeTab === tab && styles.activeTabButtonText
-              ]}
-            >
-              {tab}
-            </Text>
+            <Text style={[styles.tabButtonText, activeTab === tab && styles.activeTabButtonText]}>{tab}</Text>
             {activeTab === tab && <View style={styles.activeTabIndicator} />}
           </Pressable>
         ))}
       </Animated.View>
-      
-      <ScrollView 
-        style={styles.scrollView} 
+
+      <ScrollView
+        style={styles.scrollView}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollViewContent}
       >
-        {activeTab === 'Overview' && renderOverviewTab()}
-        {activeTab === 'Profit' && renderProfitTab()}
-        
+        {activeTab === "Overview" && renderOverviewTab()}
+        {activeTab === "Profit" && renderProfitTab()}
+
         <View style={styles.disclaimer}>
           <Text style={styles.disclaimerText}>
             Past performance is not indicative of future results. Trading involves risk.
@@ -372,7 +326,7 @@ export default function StatisticsScreen() {
         </View>
       </ScrollView>
     </SafeAreaView>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -381,9 +335,9 @@ const styles = StyleSheet.create({
     backgroundColor: darkTheme.background,
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingHorizontal: 20,
     paddingTop: 10,
     paddingBottom: 15,
@@ -402,8 +356,8 @@ const styles = StyleSheet.create({
     color: darkTheme.secondaryText,
   },
   headerActions: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   refreshButton: {
     padding: 8,
@@ -415,23 +369,23 @@ const styles = StyleSheet.create({
   statusBar: {
     paddingVertical: 6,
     paddingHorizontal: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexDirection: 'row',
+    alignItems: "center",
+    justifyContent: "center",
+    flexDirection: "row",
     marginBottom: 6,
     borderRadius: 8,
   },
   statusBarOnline: {
-    backgroundColor: 'rgba(76, 175, 80, 0.2)', // Green for online
+    backgroundColor: "rgba(76, 175, 80, 0.2)", // Green for online
   },
   statusBarOffline: {
-    backgroundColor: 'rgba(244, 67, 54, 0.2)', // Red for offline
+    backgroundColor: "rgba(244, 67, 54, 0.2)", // Red for offline
   },
   marketOpen: {
-    backgroundColor: 'rgba(76, 175, 80, 0.2)', // Green for open
+    backgroundColor: "rgba(76, 175, 80, 0.2)", // Green for open
   },
   marketClosed: {
-    backgroundColor: 'rgba(244, 67, 54, 0.2)', // Red for closed
+    backgroundColor: "rgba(244, 67, 54, 0.2)", // Red for closed
   },
   marketIcon: {
     marginRight: 6,
@@ -439,17 +393,17 @@ const styles = StyleSheet.create({
   statusBarText: {
     color: darkTheme.text,
     fontSize: 12,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   tabsContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
     paddingHorizontal: 20,
     marginBottom: 15,
   },
   tabButton: {
     marginRight: 24,
     paddingVertical: 8,
-    position: 'relative',
+    position: "relative",
   },
   activeTabButton: {
     // Active state is handled by the indicator
@@ -464,7 +418,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   activeTabIndicator: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 0,
     left: 0,
     right: 0,
@@ -481,11 +435,11 @@ const styles = StyleSheet.create({
   tabContent: {
     paddingHorizontal: 20,
   },
-  
+
   // Overview Tab Styles
   overviewCard: {
     borderRadius: 16,
-    overflow: 'hidden',
+    overflow: "hidden",
     marginBottom: 20,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
@@ -500,9 +454,9 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   overviewCardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 20,
   },
   overviewCardTitle: {
@@ -511,7 +465,7 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
   },
   overviewCardBadge: {
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    backgroundColor: "rgba(255, 255, 255, 0.2)",
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 12,
@@ -522,12 +476,12 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   overviewCardStats: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   overviewCardStat: {
-    alignItems: 'center',
+    alignItems: "center",
     flex: 1,
   },
   overviewCardStatValue: {
@@ -543,17 +497,17 @@ const styles = StyleSheet.create({
   overviewCardDivider: {
     width: 1,
     height: 40,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    backgroundColor: "rgba(255, 255, 255, 0.2)",
   },
-  
+
   statsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
     marginBottom: 20,
   },
   statCard: {
-    width: '48%',
+    width: "48%",
     backgroundColor: darkTheme.cardBackground,
     borderRadius: 16,
     padding: 16,
@@ -577,7 +531,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: darkTheme.secondaryText,
   },
-  
+
   weeklyPerformanceCard: {
     backgroundColor: darkTheme.cardBackground,
     borderRadius: 16,
@@ -598,13 +552,13 @@ const styles = StyleSheet.create({
     color: darkTheme.text,
   },
   weeklyPerformanceChart: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     height: 160,
   },
   weeklyPerformanceBar: {
-    alignItems: 'center',
-    width: '13%',
+    alignItems: "center",
+    width: "13%",
   },
   weeklyPerformanceValue: {
     fontSize: 12,
@@ -614,13 +568,13 @@ const styles = StyleSheet.create({
   weeklyPerformanceBarContainer: {
     height: 100,
     width: 8,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
     borderRadius: 4,
-    overflow: 'hidden',
-    justifyContent: 'flex-end',
+    overflow: "hidden",
+    justifyContent: "flex-end",
   },
   weeklyPerformanceBarFill: {
-    width: '100%',
+    width: "100%",
     borderRadius: 4,
   },
   weeklyPerformanceDay: {
@@ -628,11 +582,11 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: darkTheme.secondaryText,
   },
-  
+
   // Profit Tab Styles
   profitCard: {
     borderRadius: 16,
-    overflow: 'hidden',
+    overflow: "hidden",
     marginBottom: 20,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
@@ -647,8 +601,8 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   profitCardHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 16,
   },
   profitCardTitle: {
@@ -664,14 +618,14 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   profitCardStats: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
   profitCardStat: {
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
     borderRadius: 12,
     padding: 12,
-    width: '48%',
+    width: "48%",
   },
   profitCardStatLabel: {
     fontSize: 14,
@@ -683,7 +637,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: "#FFFFFF",
   },
-  
+
   profitBreakdownCard: {
     backgroundColor: darkTheme.cardBackground,
     borderRadius: 16,
@@ -705,9 +659,9 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   profitBreakdownItemHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 8,
   },
   profitBreakdownItemTitle: {
@@ -721,15 +675,15 @@ const styles = StyleSheet.create({
   },
   profitBreakdownItemBar: {
     height: 8,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
     borderRadius: 4,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   profitBreakdownItemBarFill: {
-    height: '100%',
+    height: "100%",
     borderRadius: 4,
   },
-  
+
   profitTimeCard: {
     backgroundColor: darkTheme.cardBackground,
     borderRadius: 16,
@@ -748,8 +702,8 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   profitTimeItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 16,
   },
   profitTimeItemDot: {
@@ -768,7 +722,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "600",
   },
-  
+
   // Shared Styles
   positiveText: {
     color: darkTheme.success,
@@ -784,7 +738,7 @@ const styles = StyleSheet.create({
   disclaimerText: {
     fontSize: 12,
     color: darkTheme.secondaryText,
-    textAlign: 'center',
-    fontStyle: 'italic',
+    textAlign: "center",
+    fontStyle: "italic",
   },
-});
+})

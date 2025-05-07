@@ -26,16 +26,9 @@ export const CONFIG = {
     "EUR/GBP",
     "GBP/CHF",
     "EUR/CHF",
-    "USD/SGD"
+    "USD/SGD",
   ],
-  STANDARD_PAIRS: [
-    "EUR/USD",
-    "GBP/USD",
-    "USD/JPY",
-    "AUD/USD",
-    "USD/CAD",
-    "NZD/USD"
-  ],
+  STANDARD_PAIRS: ["EUR/USD", "GBP/USD", "USD/JPY", "AUD/USD", "USD/CAD", "NZD/USD"],
   RECOMMENDED_BROKERS: [
     {
       name: "Broker One",
@@ -60,7 +53,7 @@ export const CONFIG = {
     BACKEND_URL: "https://api.tradingproanalytics.com/ai/predict", // Not used in local mode
     TENSORFLOW_JS_MODEL_PATH: "local://forex-model", // Local storage path
     PREDICTION_THRESHOLD: 0.6, // Minimum confidence for a signal to be generated
-    FEATURES: ['price', 'volume', 'rsi', 'ma20', 'ma50'], // Features used for prediction
+    FEATURES: ["price", "volume", "rsi", "ma20", "ma50"], // Features used for prediction
   },
   APP: {
     VERSION: "1.0.0",
@@ -82,4 +75,4 @@ export const CONFIG = {
     DATA_REFRESH_INTERVAL: 30000, // 30 seconds for real-time data refresh
     SIGNAL_REFRESH_INTERVAL: 60000, // 1 minute for signal generation
   },
-};
+}

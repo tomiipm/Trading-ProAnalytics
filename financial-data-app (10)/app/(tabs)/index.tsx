@@ -1,158 +1,145 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, FlatList, TouchableOpacity, Platform, Dimensions } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { StatusBar } from 'expo-status-bar';
-import { useRouter } from 'expo-router';
-import { BarChart2, Filter, Star, Clock, Zap, RefreshCw, Globe } from 'lucide-react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { useForexStore } from '@/store/forex-store';
-import SignalCard from '@/components/SignalCard';
-import { darkTheme } from '@/constants/colors';
-import { Signal } from '@/types/forex';
-import { fetchSignals } from '@/services/api';
-import { useForexData } from '@/hooks/useForexData';
-import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
+"use client"
 
-const { width } = Dimensions.get('window');
+import { useState, useEffect } from "react"
+import { StyleSheet, View, Text, FlatList, TouchableOpacity, Dimensions } from "react-native"
+import { SafeAreaView } from "react-native-safe-area-context"
+import { StatusBar } from "expo-status-bar"
+import { useRouter } from "expo-router"
+import { BarChart2, Filter, Star, Clock, Zap, RefreshCw, Globe } from "lucide-react-native"
+import { LinearGradient } from "expo-linear-gradient"
+import { useForexStore } from "@/store/forex-store"
+import SignalCard from "@/components/SignalCard"
+import { darkTheme } from "@/constants/colors"
+import type { Signal } from "@/types/forex"
+import { useForexData } from "@/hooks/useForexData"
+import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated"
+
+const { width } = Dimensions.get("window")
 
 export default function SignalsScreen() {
-  const router = useRouter();
-  const { signals, setSignals, setSelectedSignal, isPremium, addNotification, isMarketOpen, currentSession } = useForexStore();
-  const { isLoading, error, refreshData, isApiAvailable } = useForexData();
-  const [activeTab, setActiveTab] = useState('active');
-  
+  const router = useRouter()
+  const { signals, setSignals, setSelectedSignal, isPremium, addNotification, isMarketOpen, currentSession } =
+    useForexStore()
+  const { isLoading, error, refreshData, isApiAvailable } = useForexData()
+  const [activeTab, setActiveTab] = useState("active")
+
   // Animation values for refresh icon
-  const refreshRotation = useSharedValue(0);
-  
+  const refreshRotation = useSharedValue(0)
+
   useEffect(() => {
     // Simulate receiving a new notification after 5 seconds
     const timer = setTimeout(() => {
       addNotification({
         id: `notification-${Date.now()}`,
-        title: 'New Trading Signal',
-        message: 'A new EUR/USD trading opportunity is available. Check it out now!',
+        title: "New Trading Signal",
+        message: "A new EUR/USD trading opportunity is available. Check it out now!",
         timestamp: new Date().toISOString(),
         read: false,
-        type: 'signal',
-      });
-    }, 5000);
-    
-    return () => clearTimeout(timer);
-  }, []);
-  
+        type: "signal",
+      })
+    }, 5000)
+
+    return () => clearTimeout(timer)
+  }, [])
+
   const handleSignalPress = (signal: Signal) => {
-    setSelectedSignal(signal);
-    router.push('/signal-details');
-  };
-  
+    setSelectedSignal(signal)
+    router.push("/signal-details")
+  }
+
   const handlePremiumPress = () => {
-    router.push('/premium');
-  };
-  
+    router.push("/premium")
+  }
+
   const handleAccountPress = () => {
-    router.push('/account');
-  };
-  
+    router.push("/account")
+  }
+
   const handleRefresh = () => {
-    refreshData();
+    refreshData()
     // Animate refresh icon
-    refreshRotation.value = withSpring(refreshRotation.value + 360);
-  };
-  
+    refreshRotation.value = withSpring(refreshRotation.value + 360)
+  }
+
   const filteredSignals = () => {
     switch (activeTab) {
-      case 'active':
-        return signals.filter(signal => signal.status === 'active');
-      case 'recent':
-        return signals.filter(signal => signal.status === 'completed');
-      case 'favorites':
-        return signals.filter(signal => signal.isFavorite);
+      case "active":
+        return signals.filter((signal) => signal.status === "active")
+      case "recent":
+        return signals.filter((signal) => signal.status === "completed")
+      case "favorites":
+        return signals.filter((signal) => signal.isFavorite)
       default:
-        return signals;
+        return signals
     }
-  };
-  
+  }
+
   const refreshAnimatedStyle = useAnimatedStyle(() => {
     return {
-      transform: [{ rotate: `${refreshRotation.value}deg` }]
-    };
-  });
-  
+      transform: [{ rotate: `${refreshRotation.value}deg` }],
+    }
+  })
+
   const renderHeader = () => (
     <View style={styles.header}>
       <View style={styles.titleContainer}>
         <BarChart2 size={width > 400 ? 24 : 22} color={darkTheme.text} />
         <Text style={styles.title}>Trading Signals</Text>
       </View>
-      
+
       <View style={styles.headerButtons}>
-        <TouchableOpacity 
-          style={styles.refreshButton}
-          onPress={handleRefresh}
-        >
+        <TouchableOpacity style={styles.refreshButton} onPress={handleRefresh}>
           <Animated.View style={refreshAnimatedStyle}>
             <RefreshCw size={width > 400 ? 20 : 18} color={darkTheme.accent} />
           </Animated.View>
         </TouchableOpacity>
-        
-        <TouchableOpacity 
-          style={styles.accountButton}
-          onPress={handleAccountPress}
-        >
+
+        <TouchableOpacity style={styles.accountButton} onPress={handleAccountPress}>
           <Text style={styles.accountButtonText}>Account</Text>
         </TouchableOpacity>
-        
+
         {!isPremium && (
-          <TouchableOpacity 
-            style={styles.premiumButton}
-            onPress={handlePremiumPress}
-          >
+          <TouchableOpacity style={styles.premiumButton} onPress={handlePremiumPress}>
             <Zap size={width > 400 ? 16 : 14} color="#000" />
             <Text style={styles.premiumButtonText}>Premium</Text>
           </TouchableOpacity>
         )}
       </View>
     </View>
-  );
-  
+  )
+
   const renderTabs = () => (
     <View style={styles.tabsContainer}>
       <TouchableOpacity
-        style={[styles.tab, activeTab === 'active' && styles.activeTab]}
-        onPress={() => setActiveTab('active')}
+        style={[styles.tab, activeTab === "active" && styles.activeTab]}
+        onPress={() => setActiveTab("active")}
       >
-        <Text style={[styles.tabText, activeTab === 'active' && styles.activeTabText]}>
-          Active
-        </Text>
+        <Text style={[styles.tabText, activeTab === "active" && styles.activeTabText]}>Active</Text>
       </TouchableOpacity>
-      
+
       <TouchableOpacity
-        style={[styles.tab, activeTab === 'recent' && styles.activeTab]}
-        onPress={() => setActiveTab('recent')}
+        style={[styles.tab, activeTab === "recent" && styles.activeTab]}
+        onPress={() => setActiveTab("recent")}
       >
-        <Text style={[styles.tabText, activeTab === 'recent' && styles.activeTabText]}>
-          Last 7 Days
-        </Text>
+        <Text style={[styles.tabText, activeTab === "recent" && styles.activeTabText]}>Last 7 Days</Text>
       </TouchableOpacity>
-      
+
       <TouchableOpacity
-        style={[styles.tab, activeTab === 'favorites' && styles.activeTab]}
-        onPress={() => setActiveTab('favorites')}
+        style={[styles.tab, activeTab === "favorites" && styles.activeTab]}
+        onPress={() => setActiveTab("favorites")}
       >
-        <Text style={[styles.tabText, activeTab === 'favorites' && styles.activeTabText]}>
-          Favorites
-        </Text>
+        <Text style={[styles.tabText, activeTab === "favorites" && styles.activeTabText]}>Favorites</Text>
       </TouchableOpacity>
     </View>
-  );
-  
+  )
+
   const renderPremiumBanner = () => {
-    if (isPremium) return null;
-    
+    if (isPremium) return null
+
     return (
       <TouchableOpacity onPress={handlePremiumPress}>
         <LinearGradient
-          colors={['rgba(255, 193, 7, 0.2)', 'rgba(255, 193, 7, 0.05)']}
+          colors={["rgba(255, 193, 7, 0.2)", "rgba(255, 193, 7, 0.05)"]}
           style={styles.premiumBanner}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
@@ -163,45 +150,41 @@ export default function SignalsScreen() {
             </View>
             <View style={styles.premiumBannerTextContainer}>
               <Text style={styles.premiumBannerTitle}>Upgrade to Premium</Text>
-              <Text style={styles.premiumBannerDescription}>
-                Get unlimited signals and advanced analytics
-              </Text>
+              <Text style={styles.premiumBannerDescription}>Get unlimited signals and advanced analytics</Text>
             </View>
           </View>
         </LinearGradient>
       </TouchableOpacity>
-    );
-  };
-  
+    )
+  }
+
   const renderStatusBar = () => {
-    if (isApiAvailable === null) return null;
-    
+    if (isApiAvailable === null) return null
+
     return (
       <View style={styles.statusContainer}>
-        <View style={[
-          styles.statusBar,
-          isApiAvailable ? styles.statusBarOnline : styles.statusBarOffline
-        ]}>
+        <View style={[styles.statusBar, isApiAvailable ? styles.statusBarOnline : styles.statusBarOffline]}>
           <Text style={styles.statusBarText}>
-            {isApiAvailable ? 'Real-Time Data: Online' : 'Real-Time Data: Offline (Using Mock Data)'}
+            {isApiAvailable ? "Real-Time Data: Online" : "Real-Time Data: Offline (Using Mock Data)"}
           </Text>
         </View>
-        <View style={[
-          styles.statusBar,
-          isMarketOpen ? styles.marketOpen : styles.marketClosed
-        ]}>
-          <Globe size={width > 400 ? 14 : 12} color={isMarketOpen ? darkTheme.success : darkTheme.danger} style={styles.marketIcon} />
+        <View style={[styles.statusBar, isMarketOpen ? styles.marketOpen : styles.marketClosed]}>
+          <Globe
+            size={width > 400 ? 14 : 12}
+            color={isMarketOpen ? darkTheme.success : darkTheme.danger}
+            style={styles.marketIcon}
+          />
           <Text style={styles.statusBarText}>
-            {isMarketOpen ? `Market: Open (${currentSession} Session)` : 'Market: Closed'}
+            {isMarketOpen ? `Market: Open (${currentSession} Session)` : "Market: Closed"}
           </Text>
         </View>
       </View>
-    );
-  };
-  
+    )
+  }
+
   const renderEmptyState = () => (
     <View style={styles.emptyContainer}>
-      {activeTab === 'active' ? (
+      {activeTab === "active" ? (
         <>
           <Clock size={width > 400 ? 40 : 36} color={darkTheme.secondaryText} style={styles.emptyIcon} />
           <Text style={styles.emptyTitle}>No Active Signals</Text>
@@ -209,12 +192,13 @@ export default function SignalsScreen() {
             There are no active trading signals at the moment. Check back soon for new opportunities.
           </Text>
         </>
-      ) : activeTab === 'favorites' ? (
+      ) : activeTab === "favorites" ? (
         <>
           <Star size={width > 400 ? 40 : 36} color={darkTheme.secondaryText} style={styles.emptyIcon} />
           <Text style={styles.emptyTitle}>No Favorites Yet</Text>
           <Text style={styles.emptyText}>
-            You haven't added any signals to your favorites yet. Tap the star icon on any signal to add it to your favorites.
+            You haven't added any signals to your favorites yet. Tap the star icon on any signal to add it to your
+            favorites.
           </Text>
         </>
       ) : (
@@ -227,20 +211,15 @@ export default function SignalsScreen() {
         </>
       )}
     </View>
-  );
-  
+  )
+
   return (
-    <SafeAreaView style={styles.container} edges={['bottom']}>
+    <SafeAreaView style={styles.container} edges={["bottom"]}>
       <StatusBar style="light" />
-      
+
       <FlatList
         data={filteredSignals()}
-        renderItem={({ item }) => (
-          <SignalCard 
-            signal={item} 
-            onPress={() => handleSignalPress(item)}
-          />
-        )}
+        renderItem={({ item }) => <SignalCard signal={item} onPress={() => handleSignalPress(item)} />}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.listContent}
         ListHeaderComponent={
@@ -256,7 +235,7 @@ export default function SignalsScreen() {
         onRefresh={refreshData}
       />
     </SafeAreaView>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -265,26 +244,26 @@ const styles = StyleSheet.create({
     backgroundColor: darkTheme.background,
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingHorizontal: width > 400 ? 16 : 12,
     paddingTop: width > 400 ? 16 : 12,
     paddingBottom: width > 400 ? 8 : 6,
   },
   titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   title: {
     fontSize: width > 400 ? 24 : 20,
-    fontWeight: '700',
+    fontWeight: "700",
     color: darkTheme.text,
     marginLeft: width > 400 ? 8 : 6,
   },
   headerButtons: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   refreshButton: {
     padding: width > 400 ? 8 : 6,
@@ -294,30 +273,30 @@ const styles = StyleSheet.create({
     paddingHorizontal: width > 400 ? 12 : 10,
     paddingVertical: width > 400 ? 6 : 5,
     borderRadius: 16,
-    backgroundColor: 'rgba(108, 92, 231, 0.1)',
+    backgroundColor: "rgba(108, 92, 231, 0.1)",
     marginRight: width > 400 ? 8 : 6,
   },
   accountButtonText: {
     color: darkTheme.accent,
-    fontWeight: '500',
+    fontWeight: "500",
     fontSize: width > 400 ? 14 : 12,
   },
   premiumButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: width > 400 ? 12 : 10,
     paddingVertical: width > 400 ? 6 : 5,
     borderRadius: 16,
     backgroundColor: darkTheme.premium,
   },
   premiumButtonText: {
-    color: '#000',
-    fontWeight: '600',
+    color: "#000",
+    fontWeight: "600",
     marginLeft: width > 400 ? 4 : 3,
     fontSize: width > 400 ? 14 : 12,
   },
   tabsContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
     paddingHorizontal: width > 400 ? 16 : 12,
     marginTop: width > 400 ? 16 : 12,
     marginBottom: width > 400 ? 16 : 12,
@@ -327,18 +306,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: width > 400 ? 16 : 12,
     borderRadius: 20,
     marginRight: width > 400 ? 8 : 6,
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    backgroundColor: "rgba(255, 255, 255, 0.05)",
   },
   activeTab: {
     backgroundColor: darkTheme.accent,
   },
   tabText: {
     color: darkTheme.secondaryText,
-    fontWeight: '500',
+    fontWeight: "500",
     fontSize: width > 400 ? 14 : 12,
   },
   activeTabText: {
-    color: '#FFF',
+    color: "#FFF",
   },
   listContent: {
     paddingHorizontal: width > 400 ? 16 : 12,
@@ -349,20 +328,20 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     marginBottom: width > 400 ? 16 : 12,
     borderWidth: 1,
-    borderColor: 'rgba(255, 193, 7, 0.3)',
+    borderColor: "rgba(255, 193, 7, 0.3)",
   },
   premiumBannerContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     padding: width > 400 ? 16 : 12,
   },
   premiumIconContainer: {
     width: width > 400 ? 40 : 36,
     height: width > 400 ? 40 : 36,
     borderRadius: width > 400 ? 20 : 18,
-    backgroundColor: 'rgba(255, 193, 7, 0.15)',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "rgba(255, 193, 7, 0.15)",
+    justifyContent: "center",
+    alignItems: "center",
     marginRight: width > 400 ? 12 : 10,
   },
   premiumBannerTextContainer: {
@@ -370,7 +349,7 @@ const styles = StyleSheet.create({
   },
   premiumBannerTitle: {
     fontSize: width > 400 ? 16 : 14,
-    fontWeight: '600',
+    fontWeight: "600",
     color: darkTheme.text,
     marginBottom: width > 400 ? 4 : 2,
   },
@@ -386,20 +365,20 @@ const styles = StyleSheet.create({
     paddingHorizontal: width > 400 ? 12 : 10,
     borderRadius: 8,
     marginBottom: width > 400 ? 8 : 6,
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   statusBarOnline: {
-    backgroundColor: 'rgba(76, 175, 80, 0.1)',
+    backgroundColor: "rgba(76, 175, 80, 0.1)",
   },
   statusBarOffline: {
-    backgroundColor: 'rgba(244, 67, 54, 0.1)',
+    backgroundColor: "rgba(244, 67, 54, 0.1)",
   },
   marketOpen: {
-    backgroundColor: 'rgba(76, 175, 80, 0.1)',
+    backgroundColor: "rgba(76, 175, 80, 0.1)",
   },
   marketClosed: {
-    backgroundColor: 'rgba(244, 67, 54, 0.1)',
+    backgroundColor: "rgba(244, 67, 54, 0.1)",
   },
   marketIcon: {
     marginRight: width > 400 ? 8 : 6,
@@ -410,8 +389,8 @@ const styles = StyleSheet.create({
   },
   emptyContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     padding: width > 400 ? 40 : 30,
   },
   emptyIcon: {
@@ -419,16 +398,16 @@ const styles = StyleSheet.create({
   },
   emptyTitle: {
     fontSize: width > 400 ? 18 : 16,
-    fontWeight: '600',
+    fontWeight: "600",
     color: darkTheme.text,
     marginBottom: width > 400 ? 8 : 6,
-    textAlign: 'center',
+    textAlign: "center",
   },
   emptyText: {
     fontSize: width > 400 ? 14 : 12,
     color: darkTheme.secondaryText,
-    textAlign: 'center',
+    textAlign: "center",
     paddingHorizontal: width > 400 ? 20 : 15,
     lineHeight: width > 400 ? 20 : 18,
   },
-});
+})

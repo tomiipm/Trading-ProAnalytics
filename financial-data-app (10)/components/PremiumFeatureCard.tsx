@@ -1,34 +1,28 @@
-import React from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Platform, ActivityIndicator, Dimensions } from 'react-native';
-import { Star, Zap, ShoppingCart } from 'lucide-react-native';
-import { darkTheme } from '@/constants/colors';
-import { LinearGradient } from 'expo-linear-gradient';
-import { CONFIG } from '@/constants/config';
+import { StyleSheet, Text, View, TouchableOpacity, Platform, ActivityIndicator, Dimensions } from "react-native"
+import { Zap, ShoppingCart } from "lucide-react-native"
+import { darkTheme } from "@/constants/colors"
+import { LinearGradient } from "expo-linear-gradient"
+import { CONFIG } from "@/constants/config"
 
-const { width } = Dimensions.get('window');
+const { width } = Dimensions.get("window")
 
 interface PremiumFeatureCardProps {
-  title: string;
-  onPress: () => void;
-  description?: string;
-  isLoading?: boolean;
+  title: string
+  onPress: () => void
+  description?: string
+  isLoading?: boolean
 }
 
-export default function PremiumFeatureCard({ 
-  title, 
-  onPress, 
+export default function PremiumFeatureCard({
+  title,
+  onPress,
   description = "Unlock premium signals with higher accuracy and more detailed analysis",
-  isLoading = false
+  isLoading = false,
 }: PremiumFeatureCardProps) {
   return (
-    <TouchableOpacity 
-      style={styles.container} 
-      onPress={onPress} 
-      activeOpacity={0.9}
-      disabled={isLoading}
-    >
+    <TouchableOpacity style={styles.container} onPress={onPress} activeOpacity={0.9} disabled={isLoading}>
       <LinearGradient
-        colors={['rgba(253, 203, 110, 0.2)', 'rgba(253, 203, 110, 0.05)']}
+        colors={["rgba(253, 203, 110, 0.2)", "rgba(253, 203, 110, 0.05)"]}
         style={styles.gradient}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
@@ -51,7 +45,7 @@ export default function PremiumFeatureCard({
               <>
                 <ShoppingCart size={width > 400 ? 14 : 12} color="#000" />
                 <Text style={styles.buttonText}>
-                  {Platform.OS === 'ios' ? 'App Store' : Platform.OS === 'android' ? 'Google Play' : 'Subscribe'}
+                  {Platform.OS === "ios" ? "App Store" : Platform.OS === "android" ? "Google Play" : "Subscribe"}
                 </Text>
               </>
             )}
@@ -59,33 +53,33 @@ export default function PremiumFeatureCard({
         </View>
       </LinearGradient>
     </TouchableOpacity>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
   container: {
     marginBottom: width > 400 ? 16 : 12,
     borderRadius: 16,
-    overflow: 'hidden',
-    width: width > 400 ? 'auto' : '100%',
+    overflow: "hidden",
+    width: width > 400 ? "auto" : "100%",
   },
   gradient: {
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: 'rgba(253, 203, 110, 0.3)',
+    borderColor: "rgba(253, 203, 110, 0.3)",
   },
   content: {
     padding: width > 400 ? 16 : 12,
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   iconContainer: {
     width: width > 400 ? 40 : 36,
     height: width > 400 ? 40 : 36,
     borderRadius: width > 400 ? 20 : 18,
-    backgroundColor: 'rgba(253, 203, 110, 0.15)',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "rgba(253, 203, 110, 0.15)",
+    justifyContent: "center",
+    alignItems: "center",
     marginRight: width > 400 ? 12 : 10,
   },
   textContainer: {
@@ -104,7 +98,7 @@ const styles = StyleSheet.create({
   },
   priceText: {
     fontSize: width > 400 ? 12 : 11,
-    fontWeight: '600',
+    fontWeight: "600",
     color: darkTheme.premium,
   },
   buttonContainer: {
@@ -112,15 +106,15 @@ const styles = StyleSheet.create({
     paddingVertical: width > 400 ? 8 : 6,
     paddingHorizontal: width > 400 ? 12 : 10,
     borderRadius: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     minWidth: width > 400 ? 100 : 90,
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   buttonText: {
-    color: '#000',
+    color: "#000",
     fontSize: width > 400 ? 12 : 11,
     fontWeight: "600",
     marginLeft: width > 400 ? 4 : 3,
   },
-});
+})

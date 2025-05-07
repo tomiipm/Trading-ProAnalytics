@@ -1,9 +1,9 @@
-import { createTRPCReact } from "@trpc/react-query";
-import { createTRPCClient, httpBatchLink } from "@trpc/client";
-import type { AppRouter } from "@/backend/trpc/app-router";
+import { createTRPCReact } from "@trpc/react-query"
+import { createTRPCClient, httpBatchLink } from "@trpc/client"
+import type { AppRouter } from "@/backend/trpc/app-router"
 
 // Create React hooks
-export const trpc = createTRPCReact<AppRouter>();
+export const trpc = createTRPCReact<AppRouter>()
 
 // Create a standalone client for use outside of React components
 export const trpcClient = createTRPCClient<AppRouter>({
@@ -12,4 +12,4 @@ export const trpcClient = createTRPCClient<AppRouter>({
       url: "/api/trpc",
     }),
   ],
-});
+})

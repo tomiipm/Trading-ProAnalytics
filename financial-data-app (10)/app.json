@@ -22,9 +22,7 @@
       "bundleIdentifier": "com.tradingproanalytics.app",
       "buildNumber": "1",
       "infoPlist": {
-        "UIBackgroundModes": [
-          "remote-notification"
-        ]
+        "UIBackgroundModes": ["remote-notification"]
       }
     },
     "android": {
@@ -35,10 +33,7 @@
       "package": "com.tradingproanalytics.app",
       "versionCode": 1,
       "googleServicesFile": "./google-services.json",
-      "permissions": [
-        "RECEIVE_BOOT_COMPLETED",
-        "VIBRATE"
-      ]
+      "permissions": ["RECEIVE_BOOT_COMPLETED", "VIBRATE"]
     },
     "web": {
       "favicon": "https://placehold.co/32x32?text=TPA+Favicon"
@@ -55,9 +50,7 @@
         {
           "icon": "https://placehold.co/512x512?text=TPA+Notification+Icon",
           "color": "#3F51B5",
-          "sounds": [
-            "./assets/notification.wav"
-          ]
+          "sounds": ["./assets/notification.wav"]
         }
       ]
     ],
